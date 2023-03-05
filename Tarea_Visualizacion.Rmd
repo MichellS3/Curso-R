@@ -5,63 +5,112 @@ date: "2023-03-04"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+##Figura 01
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
+Librerias a utilizar
+```{r}
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
 library(reprex)
-
-ruta <- "https://raw.githubusercontent.com/martintinch0/CienciaDeDatosParaCuriosos/master/data/gapminder.csv"
-df_gapminder <- read.table(file = ruta, sep=';', header = TRUE, stringsAsFactors = FALSE)
-df_gapminder2007<- df_gapminder %>% filter(year==2007, continent=='Africa')
-head(df_gapminder, 2)
+library(ggpubr)
 ```
 
-## Including Plots
+
+```{r}
+data(mtcars)
+mtcars$name=rownames(mtcars)
+mtcars$cyl=as.factor(mtcars$cyl)
+data(diamonds)
+data("faithfuld")
+
+set.seed(42)
+n<-1000
+x<-runif(n)*3
+y<-x*sin(1/x)+rnorm(n)/25
+df<-data.frame(x=x,
+               y=y)
+
+Fig1<-ggbarplot(mtcars, x='name', y='mpg', fill='cyl',
+                color='white', palette='jco',
+                sort.val='asc', sort.by.groups=TRUE,
+                x.text.angle=90) + font('x.text',size=8)
+
+Fig2<- ggplot(diamonds, aes(depth, fill=cut, colour=cut))+ geom_density(alpha=0.2,na.rm = TRUE) +
+  xlim(58,68) + theme_classic() + theme(legend.position = 'bottom')
+
+Fig3<-ggplot(df, aes(x,y))+geom_point(alpha=0.3,col='navyblue')+
+  geom_smooth(se=FALSE)+ scale_x_continuous(limits = c(0,0.5))+scale_y_continuous(limits = c(-0.3,0.4))+
+  theme_bw()
+
+Fig4<-ggdotplot(ToothGrowth, x='dose', y='len', color = 'dose', palette = 'jco', binwidth = 1) +
+  theme_classic()
+
+Fig5<- ggscatter(mtcars, x='wt', y='mpg', add='reg.line', conf.int = TRUE,
+                 color = 'cyl', palette = 'jco',shape = 'cyl')+
+  stat_cor(aes(color=cyl),label.x.npc = 'centre',label.y.npc = 'top')
+
+Fig6<-ggplot(faithfuld,aes(eruptions,waiting)) + geom_raster(aes(fill=density)) + theme_classic() + scale_fill_gradientn(colours = heat.colors(10,rev=TRUE),na.value = 'white')
+```
+
+
+```{r}
+ggarrange(Fig1,
+          ggarrange(Fig2,
+                    ggarrange(Fig3, Fig4, Fig5, Fig6, nrow=2, ncol=2,
+                              labels = c('B','C','D','E')),
+                    ncol = 2,labels = 'F'),
+          nrow = 2,labels = 'A')
+```
+
+
+
+```{r cars}
+
+
+
+```
+
+## Figura 02
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-pt7<-df_gapminder %>% 
-  filter (year=="2007") %>%
+```{r}
+data <- "https://raw.githubusercontent.com/martintinch0/CienciaDeDatosParaCuriosos/master/data/gapminder.csv"
+df_gapminder <- read.table(file = data, sep=';', header = TRUE, stringsAsFactors = FALSE)
+df_gapminder2007<- df_gapminder %>% filter(year==2007)
+
+Fig7<-df_gapminder2007 %>% 
   ggplot(aes(x = gdpPercap, y = lifeExp, size=pop, color=continent)) +
-  geom_point()+
+  geom_point(alpha=0.6)+
   labs(x = "Ingreso promedio (USD)",
        y = "Expectativa de vida al nacer (años)",
        title="Esperanza de vida debido al ingreso promedio - 2007",
-       caption="Fuente: Gapminder",
        color="Continente: ")+
   theme(legend.position="bottom",legend.title=element_text(face="bold",color="black",size=10), 
         panel.background = element_rect(fill = "white", colour = "grey80"), 
-        panel.grid.major = element_line(colour = "grey90", linetype = "dotted"))+
-  geom_text_repel(aes(label = country),size = 3) +
-  guides(size="none")
+        panel.grid.major = element_line(colour = "grey90", linetype = 1),
+        panel.border = element_rect(colour = "black", 
+    fill = NA))+
+  geom_text_repel(aes(label=country, size=pop), point.padding = 9, max.overlaps = 13)+
+  ylim(40,85)+
+  guides(size='none')
 
-pt8<-df_gapminder %>% 
-  filter (year=="2007") %>%
+Fig8<-df_gapminder2007 %>% 
   ggplot(aes(x = gdpPercap, y = lifeExp, size=pop, color=continent)) +
-  geom_point()+
+  geom_point(alpha=0.6)+
   labs(x = NULL, y=NULL)+
   scale_x_continuous(limits = c(6000,8000))+
   scale_y_continuous(limits = c(65,80))+
-  theme(legend.position="none",legend.title=element_text(face="bold",color="black",size=10), 
-        panel.background = element_rect(fill = "white", colour = "grey80"), 
-        panel.grid.major = element_line(colour = "grey90", linetype = "dotted"))+
-  geom_text_repel(aes(label = country),size = 3) +
-  guides(size="none")
+  theme(panel.background = element_rect(fill = "white", colour = "grey80"), 
+        panel.grid.major = element_line(colour = "grey90", linetype = 1),
+        panel.border = element_rect(colour = "black", 
+    fill = NA),
+    plot.background = element_rect(colour = "black"))+
+  geom_text_repel(aes(label=country, size=pop), point.padding =0.7) +
+  guides(colour='none', size="none")
 
-pt7 + annotation_custom(ggplotGrob(pt8), xmin = 30000, xmax = 50000, 
+Fig7 + annotation_custom(ggplotGrob(Fig8), xmin = 30000, xmax = 50000, 
                        ymin = 40, ymax = 60)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

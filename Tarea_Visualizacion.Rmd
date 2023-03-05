@@ -61,19 +61,14 @@ ggarrange(Fig1,
                               labels = c('B','C','D','E')),
                     ncol = 2,labels = 'F'),
           nrow = 2,labels = 'A')
-```
 
-
-
-```{r cars}
-
-
+ggsave(filename = "C:/Users/miche/Documents/Curso-R/Arrange.png", 
+       width = 14, height = 12, dpi = 300, units = "in", device='png')
 
 ```
+
 
 ## Figura 02
-
-You can also embed plots, for example:
 
 ```{r}
 data <- "https://raw.githubusercontent.com/martintinch0/CienciaDeDatosParaCuriosos/master/data/gapminder.csv"
@@ -112,5 +107,8 @@ Fig8<-df_gapminder2007 %>%
 
 Fig7 + annotation_custom(ggplotGrob(Fig8), xmin = 30000, xmax = 50000, 
                        ymin = 40, ymax = 60)
+
+ggsave(filename = "C:/Users/miche/Documents/Curso-R/Anotation.png", 
+       width = 10, height = 6, dpi = 300, units = "in", device='png')
 ```
 
